@@ -18,8 +18,11 @@ def home():
 def health():
     return jsonify({"status": "ok", "service": "bolt-crossfit"})
 
-@app.route("/webhook/telegram", methods=["POST"])
+@app.route("/webhook/telegram", methods=["GET", "POST"])
 def telegram_webhook():
+    if request.method == "GET":
+        return jsonify({"status": "ok"}), 200
+
     try:
         data = request.get_json()
         
