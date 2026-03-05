@@ -12,7 +12,7 @@ def index():
 
 @app.route("/health", methods=["GET"])
 def health():
-    return jsonify({"status": "ok", "service": "bolt-crossfit", "version": "2.0"})
+    return jsonify({"status": "ok", "service": "bolt-crossfit", "version": "2.1"})
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5000))
