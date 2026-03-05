@@ -13,7 +13,7 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8329833479:AAEyoKFEpOspoo_
 
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({"status": "BOLT API Online", "version": "1.0"})
+    return jsonify({"status": "BOLT API Online", "version": "1.1"})
 
 @app.route("/health", methods=["GET"])
 def health():
