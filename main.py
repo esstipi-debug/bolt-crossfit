@@ -1,11 +1,14 @@
 ﻿from flask import Flask, request, jsonify
 import os
 import requests
+import logging
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = Flask(__name__)
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "https://qvcrpwfwqjmuaeaybycn.supabase.co")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY", "sb_publishable_YbUSxwE3s9kLgI6he0JbGw_XtdBcIPo")
@@ -21,26 +24,24 @@ def health():
 
 def send_telegram_message(chat_id, text):
     """Send a message to a Telegram chat"""
-    print(f"[DEBUG] Iniciando send_telegram_message para {chat_id}")
+    logger.info(f"[DEBUG] Iniciando send_telegram_message para {chat_id}")
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     data = {
         "chat_id": chat_id,
         "text": text
     }
     try:
-        print(f"[DEBUG] URL: {url}")
-        print(f"[DEBUG] Data: {data}")
+        logger.info(f"[DEBUG] URL: {url}")
+        logger.info(f"[DEBUG] Data: {data}")
         response = requests.post(url, json=data, timeout=5)
-        print(f"[DEBUG] Status code: {response.status_code}")
-        print(f"[DEBUG] Response: {response.text}")
+        logger.info(f"[DEBUG] Status code: {response.status_code}")
+        logger.info(f"[DEBUG] Response: {response.text}")
         if response.status_code == 200:
-            print(f"✉️ Mensaje enviado a {chat_id}: {text}")
+            logger.info(f"✉️ Mensaje enviado a {chat_id}: {text}")
         else:
-            print(f"❌ Error HTTP {response.status_code}: {response.text}")
+            logger.error(f"❌ Error HTTP {response.status_code}: {response.text}")
     except Exception as e:
-        print(f"❌ Exception en send_telegram_message: {type(e).__name__}: {e}")
-        import traceback
-        traceback.print_exc()
+        logger.error(f"❌ Exception en send_telegram_message: {type(e).__name__}: {e}")
 
 @app.route("/webhook/telegram", methods=["GET", "POST"])
 def telegram_webhook():
@@ -55,7 +56,7 @@ def telegram_webhook():
             chat_id = message["chat"]["id"]
             text = message.get("text", "")
             
-            print(f"📨 Mensaje recibido: {text} (Chat ID: {chat_id})")
+            logger.info(f"📨 Mensaje recibido: {text} (Chat ID: {chat_id})")
             
             if text == "/start":
                 response_text = "¡Hola! Bienvenido a BOLT CrossFit Performance."
@@ -67,7 +68,7 @@ def telegram_webhook():
         return jsonify({"ok": True})
     
     except Exception as e:
-        print(f"❌ Error: {e}")
+        logger.error(f"❌ Error: {e}")
         return jsonify({"ok": False, "error": str(e)}), 500
 
 if __name__ == "__main__":
