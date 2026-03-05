@@ -21,16 +21,26 @@ def health():
 
 def send_telegram_message(chat_id, text):
     """Send a message to a Telegram chat"""
+    print(f"[DEBUG] Iniciando send_telegram_message para {chat_id}")
     url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
     data = {
         "chat_id": chat_id,
         "text": text
     }
     try:
-        requests.post(url, json=data)
-        print(f"✉️ Mensaje enviado a {chat_id}: {text}")
+        print(f"[DEBUG] URL: {url}")
+        print(f"[DEBUG] Data: {data}")
+        response = requests.post(url, json=data, timeout=5)
+        print(f"[DEBUG] Status code: {response.status_code}")
+        print(f"[DEBUG] Response: {response.text}")
+        if response.status_code == 200:
+            print(f"✉️ Mensaje enviado a {chat_id}: {text}")
+        else:
+            print(f"❌ Error HTTP {response.status_code}: {response.text}")
     except Exception as e:
-        print(f"❌ Error enviando mensaje: {e}")
+        print(f"❌ Exception en send_telegram_message: {type(e).__name__}: {e}")
+        import traceback
+        traceback.print_exc()
 
 @app.route("/webhook/telegram", methods=["GET", "POST"])
 def telegram_webhook():
